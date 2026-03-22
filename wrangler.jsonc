@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "hluaguo-com",
-	"main": "./dist/server/entry.mjs",
+	// "main": "./dist/server/entry.mjs",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": [
 		"nodejs_compat"
