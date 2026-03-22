@@ -8,7 +8,7 @@
 	"pages_build_output_dir": "./dist",
 	"r2_buckets": [
 		{
-			"binding": "OUTPOST_ASSETS",
+			"binding": "OUTPOST_STORAGE",
 			"bucket_name": "hluaguo-outpost-assets"
 		}
 	],

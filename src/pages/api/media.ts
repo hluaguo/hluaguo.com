@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 
 export const GET: APIRoute = async ({ url }) => {
-  const bucket = (env as any).OUTPOST_ASSETS;
+  const bucket = (env as any).OUTPOST_STORAGE;
   const path = url.searchParams.get('path');
 
   if (!path) {

@@ -3,7 +3,7 @@ import { env } from 'cloudflare:workers';
 
 export const POST: APIRoute = async ({ request }) => {
   const db = (env as any).OUTPOST_DB;
-  const bucket = (env as any).OUTPOST_ASSETS;
+  const bucket = (env as any).OUTPOST_STORAGE;
 
   try {
     const data = await request.formData();

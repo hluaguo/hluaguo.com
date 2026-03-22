@@ -6,7 +6,7 @@ import { env } from 'cloudflare:workers';
 
 const { slug } = Astro.params;
 const db = (env as any).OUTPOST_DB;
-const bucket = (env as any).OUTPOST_ASSETS;
+const bucket = (env as any).OUTPOST_STORAGE;
 
 // 1. Fetch metadata from D1
 const post = await db.prepare('SELECT * FROM posts WHERE slug = ? AND is_published = 1').bind(slug).first();
