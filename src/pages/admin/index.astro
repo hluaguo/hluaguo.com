@@ -26,33 +26,52 @@ import Navigation from '../../components/Navigation.astro';
               <select id="type" name="type" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors">
                 <option value="post">Journal (Post)</option>
                 <option value="portfolio">Portfolio (Project)</option>
+                <option value="place">Atlas (Map Pin)</option>
               </select>
             </div>
             <div class="flex flex-col gap-2 md:col-span-2">
-              <label for="title" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Title</label>
+              <label for="title" id="title-label" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Title</label>
               <input type="text" id="title" name="title" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" />
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div id="standard-fields" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="flex flex-col gap-2">
+                <label for="slug" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Slug</label>
+                <input type="text" id="slug" name="slug" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="my-new-post" />
+              </div>
+              <div id="extra-container" class="flex flex-col gap-2">
+                <label id="extra-label" for="extra" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Extra (Year for Projects)</label>
+                <input type="text" id="extra" name="extra" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="2026" />
+              </div>
+            </div>
             <div class="flex flex-col gap-2">
-              <label for="slug" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Slug</label>
-              <input type="text" id="slug" name="slug" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="my-new-post" />
+              <label for="description" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Short Description</label>
+              <textarea id="description" name="description" rows="2" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors"></textarea>
             </div>
-            <div id="extra-container" class="flex flex-col gap-2">
-              <label id="extra-label" for="extra" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Extra (Year for Projects)</label>
-              <input type="text" id="extra" name="extra" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="2026" />
+          </div>
+
+          <div id="place-fields" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="flex flex-col gap-2">
+                <label for="lat" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Latitude</label>
+                <input type="text" id="lat" name="lat" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="35.0116" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label for="lng" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Longitude</label>
+                <input type="text" id="lng" name="lng" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="135.7681" />
+              </div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="image" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Memory Image (Upload to R2)</label>
+              <input type="file" id="image" name="image" accept="image/*" class="text-sm text-earth-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-earth-800 file:text-earth-100 hover:file:bg-earth-700" />
             </div>
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="description" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Short Description</label>
-            <textarea id="description" name="description" rows="2" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors"></textarea>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label for="content" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Markdown Content</label>
-            <textarea id="content" name="content" rows="12" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 font-mono text-sm focus:outline-none focus:border-earth-800 transition-colors"></textarea>
+            <label for="content" id="content-label" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Content (Markdown / Note)</label>
+            <textarea id="content" name="content" rows="10" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 font-mono text-sm focus:outline-none focus:border-earth-800 transition-colors"></textarea>
           </div>
 
           <button type="submit" id="submit-btn" class="w-full bg-earth-800 text-earth-100 py-4 uppercase tracking-[0.2em] text-sm font-bold hover:bg-earth-700 transition-all shadow-lg">
@@ -70,6 +89,7 @@ import Navigation from '../../components/Navigation.astro';
         <div class="flex gap-4">
             <button id="view-posts" class="text-[10px] uppercase tracking-widest text-earth-800 font-bold underline">Journal</button>
             <button id="view-portfolio" class="text-[10px] uppercase tracking-widest text-earth-400 font-bold hover:text-earth-800 transition-colors">Portfolio</button>
+            <button id="view-places" class="text-[10px] uppercase tracking-widest text-earth-400 font-bold hover:text-earth-800 transition-colors">Atlas</button>
         </div>
       </div>
       <div id="records-list" class="space-y-4">
@@ -81,44 +101,55 @@ import Navigation from '../../components/Navigation.astro';
   <script>
     const form = document.getElementById('admin-form');
     const typeSelect = document.getElementById('type');
+    const titleLabel = document.getElementById('title-label');
     const extraLabel = document.getElementById('extra-label');
     const extraInput = document.getElementById('extra');
+    const standardFields = document.getElementById('standard-fields');
+    const placeFields = document.getElementById('place-fields');
     const status = document.getElementById('status');
     const recordsList = document.getElementById('records-list');
+    
     const viewPostsBtn = document.getElementById('view-posts');
     const viewPortfolioBtn = document.getElementById('view-portfolio');
+    const viewPlacesBtn = document.getElementById('view-places');
 
     let currentView = 'post';
 
     typeSelect.addEventListener('change', () => {
-        if (typeSelect.value === 'portfolio') {
-            extraLabel.textContent = 'Project Year';
-            extraInput.placeholder = '2026';
+        const type = typeSelect.value;
+        if (type === 'place') {
+            titleLabel.textContent = 'Location Name';
+            standardFields.classList.add('hidden');
+            placeFields.classList.remove('hidden');
+            document.getElementById('slug').required = false;
         } else {
-            extraLabel.textContent = 'Extra (Optional)';
-            extraInput.placeholder = '';
+            titleLabel.textContent = 'Title';
+            standardFields.classList.remove('hidden');
+            placeFields.classList.add('hidden');
+            document.getElementById('slug').required = true;
+            extraLabel.textContent = type === 'portfolio' ? 'Project Year' : 'Extra (Optional)';
+            extraInput.placeholder = type === 'portfolio' ? '2026' : '';
         }
     });
 
-    viewPostsBtn.addEventListener('click', () => {
-        currentView = 'post';
-        viewPostsBtn.classList.add('underline', 'text-earth-800');
-        viewPostsBtn.classList.remove('text-earth-400');
-        viewPortfolioBtn.classList.remove('underline', 'text-earth-800');
-        viewPortfolioBtn.classList.add('text-earth-400');
+    const setView = (view) => {
+        currentView = view;
+        [viewPostsBtn, viewPortfolioBtn, viewPlacesBtn].forEach(btn => {
+            if (btn.id === `view-${view}s` || btn.id === `view-${view}`) {
+                btn.classList.add('underline', 'text-earth-800');
+                btn.classList.remove('text-earth-400');
+            } else {
+                btn.classList.remove('underline', 'text-earth-800');
+                btn.classList.add('text-earth-400');
+            }
+        });
         fetchRecords();
-    });
+    };
 
-    viewPortfolioBtn.addEventListener('click', () => {
-        currentView = 'portfolio';
-        viewPortfolioBtn.classList.add('underline', 'text-earth-800');
-        viewPortfolioBtn.classList.remove('text-earth-400');
-        viewPostsBtn.classList.remove('underline', 'text-earth-800');
-        viewPostsBtn.classList.add('text-earth-400');
-        fetchRecords();
-    });
+    viewPostsBtn.addEventListener('click', () => setView('post'));
+    viewPortfolioBtn.addEventListener('click', () => setView('portfolio'));
+    viewPlacesBtn.addEventListener('click', () => setView('place'));
 
-    // Fetch existing records
     async function fetchRecords() {
       recordsList.innerHTML = '<p class="text-earth-400 italic text-sm">Syncing...</p>';
       try {
@@ -128,9 +159,9 @@ import Navigation from '../../components/Navigation.astro';
 
         recordsList.innerHTML = data.map(p => `
           <div class="flex justify-between items-center py-3 border-b border-earth-200 group">
-            <span class="text-earth-800 font-light">${p.title}</span>
+            <span class="text-earth-800 font-light">${p.title || p.name}</span>
             <div class="flex gap-4 items-center">
-              <span class="text-[10px] uppercase tracking-widest text-earth-400 italic">${currentView === 'post' ? new Date(p.pubDate).toLocaleDateString() : p.year}</span>
+              <span class="text-[10px] uppercase tracking-widest text-earth-400 italic">${currentView === 'place' ? `${p.lat}, ${p.lng}` : (currentView === 'post' ? new Date(p.pubDate).toLocaleDateString() : p.year)}</span>
               <span class="text-xs text-earth-500 px-2 py-1 bg-earth-300 rounded uppercase tracking-tighter">Live</span>
             </div>
           </div>
@@ -157,9 +188,10 @@ import Navigation from '../../components/Navigation.astro';
         const result = await res.json();
 
         if (result.success) {
-          status.textContent = 'Record successfully deployed! Triggering redeploy...';
+          status.textContent = 'Record successfully deployed!';
           status.className = 'mt-4 text-sm italic text-green-600 font-bold';
           form.reset();
+          typeSelect.dispatchEvent(new Event('change'));
           fetchRecords();
         } else {
           throw new Error(result.error);

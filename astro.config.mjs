@@ -12,6 +12,11 @@ export default defineConfig({
     plugins: [tailwindcss()],
     optimizeDeps: {
       exclude: ['leaflet', 'react-leaflet']
+    },
+    server: {
+      watch: {
+        ignored: ['**/.wrangler/**']
+      }
     }
   },
   ssr: {
@@ -19,6 +24,7 @@ export default defineConfig({
   },
   adapter: cloudflare({
     imageService: 'cloudflare',
+    configPath: './wrangler.jsonc',
     platformProxy: {
         enabled: true
     }
