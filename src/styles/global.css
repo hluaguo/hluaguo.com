@@ -17,6 +17,10 @@
   --animate-fade-up: fade-up 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
   --animate-fade-in: fade-in 1.5s cubic-bezier(0.19, 1, 0.22, 1) both;
   --animate-scale-up: scale-up 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+
+  /* Custom Easing for transitions */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   @keyframes fade-up {
     0% { opacity: 0; transform: translateY(30px); }
@@ -29,6 +33,10 @@
   @keyframes scale-up {
     0% { opacity: 0; transform: scale(0.95); }
     100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 }
 
@@ -52,14 +60,44 @@
   .leaflet-control-attribution {
     filter: sepia(0.2) contrast(0.95) opacity(0.9);
   }
-  
-  ::selection {
-    background-color: var(--color-earth-800);
-    color: var(--color-earth-100);
+}
+
+/* Custom aesthetic utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .chill-transition {
+    transition-property: all;
+    transition-timing-function: var(--ease-out-expo);
+    transition-duration: 700ms;
+  }
+
+  .hover-lift {
+    transition-property: all;
+    transition-timing-function: var(--ease-out-expo);
+    transition-duration: 700ms;
+    @apply hover:-translate-y-1 hover:shadow-lg hover:shadow-earth-400/20;
+  }
+
+  .aesthetic-image {
+    transition-property: all;
+    transition-timing-function: var(--ease-out-expo);
+    transition-duration: 700ms;
+    @apply grayscale opacity-70 hover:grayscale-0 hover:opacity-100 scale-100 hover:scale-[1.02];
+  }
+
+  .glass-earth {
+    @apply bg-earth-200/20 backdrop-blur-md;
+  }
+
+  .dimmed-grid {
+    background-image: 
+      linear-gradient(to right, var(--color-earth-300) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-earth-300) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
   }
 }
 
-/* Custom utilities */
-.text-balance {
-  text-wrap: balance;
-}
