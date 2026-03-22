@@ -10,6 +10,12 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      exclude: ['leaflet', 'react-leaflet']
+    }
+  },
+  ssr: {
+    noExternal: ['leaflet', 'react-leaflet']
   },
   adapter: cloudflare({
     imageService: 'cloudflare',

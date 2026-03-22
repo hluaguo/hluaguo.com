@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
 // Sample places data
 const places = [
@@ -10,51 +8,70 @@ const places = [
 ];
 
 export default function ExploredMap() {
-  const [isReady, setIsReady] = useState(false);
+  const [MapComponents, setMapComponents] = useState<any>(null);
+  const [L, setL] = useState<any>(null);
 
   useEffect(() => {
-    // Only run on client
-    import('leaflet').then((L) => {
-      // Fix for missing marker icons in Leaflet with Vite
+    // Dynamic import to strictly prevent any server-side execution/imports
+    const loadMap = async () => {
       // @ts-ignore
-      import('leaflet/dist/images/marker-icon.png').then((icon) => {
-        // @ts-ignore
-        import('leaflet/dist/images/marker-shadow.png').then((iconShadow) => {
-          const DefaultIcon = L.default.icon({
-            iconUrl: icon.default,
-            shadowUrl: iconShadow.default,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            tooltipAnchor: [16, -28],
-          });
-          L.default.Marker.prototype.options.icon = DefaultIcon;
-          setIsReady(true);
-        });
+      const [Leaflet, ReactLeaflet] = await Promise.all([
+        import('leaflet'),
+        import('react-leaflet'),
+      ]);
+
+      // Fix for icons using CDN for reliability
+      // @ts-ignore
+      delete Leaflet.default.Icon.Default.prototype._getIconUrl;
+      Leaflet.default.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
       });
-    });
+
+      // Load CSS on client side only
+      await import('leaflet/dist/leaflet.css');
+
+      setL(Leaflet.default);
+      setMapComponents(ReactLeaflet);
+    };
+
+    loadMap();
   }, []);
 
-  if (!isReady) return <div className="h-[650px] w-full bg-earth-200 animate-pulse flex items-center justify-center italic text-earth-500">Initializing Atlas...</div>;
+  if (!MapComponents || !L) {
+    return (
+      <div className="h-[650px] w-full bg-earth-200 animate-pulse flex items-center justify-center italic text-earth-500">
+        Syncing with Atlas...
+      </div>
+    );
+  }
+
+  const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
 
   return (
-    <div className="h-[650px] w-full bg-earth-200 relative group">
+    <div className="h-[650px] w-full bg-earth-200 relative group overflow-hidden border border-earth-300">
       {/* Decorative corner brackets */}
-      <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-earth-800 z-10 pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-earth-800 z-10 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-earth-800 z-10 pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-earth-800 z-10 pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-earth-800 z-50 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-earth-800 z-50 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-earth-800 z-50 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-earth-800 z-50 pointer-events-none"></div>
 
-      <MapContainer center={[30, 10]} zoom={3} scrollWheelZoom={false} className="h-full w-full opacity-90 transition-opacity duration-1000 group-hover:opacity-100">
+      <MapContainer 
+        center={[25, 10]} 
+        zoom={2} 
+        scrollWheelZoom={false} 
+        className="h-full w-full opacity-90 transition-opacity duration-1000 group-hover:opacity-100"
+      >
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {places.map((place) => (
           <Marker key={place.id} position={[place.lat, place.lng]}>
-            <Popup className="custom-popup">
+            <Popup>
               <div className="font-serif p-1">
-                <strong className="block text-xl font-light text-earth-900 mb-1">{place.name}</strong>
+                <strong className="block text-lg font-light text-earth-900 mb-1">{place.name}</strong>
                 <span className="text-earth-600 text-sm italic">{place.note}</span>
               </div>
             </Popup>
