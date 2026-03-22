@@ -20,8 +20,10 @@ import Map from '../components/Map.tsx';
       </div>
     </header>
 
-    <div class="relative z-0 p-2 md:p-4 bg-earth-100 border border-earth-300 shadow-2xl shadow-earth-800/5 animate-fade-in" style="animation-delay: 400ms;">
-      <Map client:only="react" />
+    <div class="relative z-0 p-3 md:p-6 glass-earth rounded-sm shadow-2xl shadow-earth-800/10 animate-fade-in hover-lift" style="animation-delay: 400ms;">
+      <div class="relative overflow-hidden rounded-sm border border-earth-300">
+        <Map client:only="react" />
+      </div>
     </div>
 
     <div class="mt-8 flex justify-between items-center text-xs uppercase tracking-[0.2em] text-earth-500 animate-fade-up" style="animation-delay: 500ms;">

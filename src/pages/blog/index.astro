@@ -16,9 +16,9 @@ try {
 
 <Layout title="Journal - Hugo Lau">
   <Navigation />
-  <main class="flex-grow w-full max-w-4xl mx-auto px-6 md:px-12 py-12 md:py-24 relative z-10">
+  <main class="flex-grow w-full max-w-5xl mx-auto px-8 md:px-16 py-16 md:py-32 relative z-10">
     
-    <header class="mb-16 md:mb-24 text-center animate-fade-up" style="animation-delay: 200ms;">
+    <header class="mb-24 md:mb-32 text-center animate-fade-up" style="animation-delay: 200ms;">
       <h1 class="text-5xl md:text-7xl font-light text-earth-900 tracking-tight mb-4">Journal</h1>
       <p class="text-lg text-earth-600 font-light italic max-w-lg mx-auto">
         Chronicles of architecture, design, and aimless wandering.
@@ -26,30 +26,46 @@ try {
       <div class="w-px h-16 bg-earth-300 mx-auto mt-12"></div>
     </header>
 
-    <div class="space-y-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-32">
       {posts.length > 0 ? posts.map((post, index) => (
         <article class="group relative animate-fade-up" style={`animation-delay: ${300 + (index * 150)}ms;`}>
-          <a href={`/blog/${post.slug}`} class="block space-y-4">
-            <div class="flex items-baseline gap-4 mb-2">
-              <time datetime={new Date(post.pubDate).toISOString()} class="text-xs uppercase tracking-widest text-earth-500 font-medium">
-                {new Date(post.pubDate).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </time>
-              <div class="h-[1px] flex-grow bg-earth-200 group-hover:bg-earth-400 transition-colors"></div>
+          <a href={`/blog/${post.slug}`} class="block space-y-8 hover-lift">
+            <div class="relative aspect-[4/5] overflow-hidden rounded-sm">
+              {post.image_path ? (
+                <img 
+                  src={`/api/media?path=${post.image_path}`} 
+                  class="aesthetic-image w-full h-full object-cover scale-[1.01]" 
+                  alt={post.title}
+                />
+              ) : (
+                <div class="w-full h-full bg-earth-200 flex items-center justify-center italic text-earth-400 text-lg">
+                  No visual record
+                </div>
+              )}
+              <div class="absolute top-6 left-6">
+                <time datetime={new Date(post.pubDate).toISOString()} class="px-4 py-1.5 text-xs uppercase tracking-[0.3em] bg-earth-900/10 backdrop-blur-md text-earth-900 font-medium rounded-full">
+                  {new Date(post.pubDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </time>
+              </div>
             </div>
             
-            <h2 class="text-3xl md:text-4xl font-light text-earth-900 group-hover:italic transition-all duration-500">
-              {post.title}
-            </h2>
-            
-            {post.image_path && (
-                <div class="w-full h-64 md:h-80 overflow-hidden border border-earth-300">
-                    <img src={`/api/media?path=${post.image_path}`} class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
-                </div>
-            )}
+            <div class="space-y-4 px-4">
+              <h2 class="text-3xl md:text-4xl font-light text-earth-900 transition-all duration-700 leading-tight">
+                {post.title}
+              </h2>
+              
+              <!-- Expanding description -->
+              <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-700 ease-out-expo overflow-hidden">
+                <p class="text-base text-earth-700 font-light leading-relaxed min-h-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 pr-8">
+                  {post.description}
+                </p>
+              </div>
 
-            <p class="text-earth-700 font-light text-lg leading-relaxed max-w-2xl">
-              {post.description}
-            </p>
+              <div class="pt-2 flex items-center gap-2 text-earth-900 font-medium text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 chill-transition translate-y-2 group-hover:translate-y-0">
+                <span>Open Journal</span>
+                <span class="text-lg font-thin">&rarr;</span>
+              </div>
+            </div>
           </a>
         </article>
       )) : (

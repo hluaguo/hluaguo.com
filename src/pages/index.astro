@@ -13,10 +13,10 @@ try {
 <Layout title="Hugo Lau">
   <Navigation />
   
-  <main class="flex-grow w-full max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 relative z-10">
+  <main class="flex-grow w-full max-w-7xl mx-auto px-8 md:px-16 lg:px-24 py-16 md:py-32 grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-24 relative z-10">
     
     <!-- Left Column: Giant Typography & Intro -->
-    <div class="md:col-span-8 flex flex-col justify-center space-y-12">
+    <div class="md:col-span-8 flex flex-col justify-center space-y-12 relative">
       <div class="space-y-4">
         <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-light text-earth-900 leading-[0.9] tracking-tight animate-fade-up" style="animation-delay: 300ms;">
           Hello, <br />
@@ -33,13 +33,13 @@ try {
       </p>
 
       <div class="flex items-center gap-8 pt-8 animate-fade-up" style="animation-delay: 600ms;">
-        <a href="/portfolio" class="group relative px-6 py-3 overflow-hidden rounded-full border border-earth-800 text-earth-900 transition-colors hover:text-earth-100">
+        <a href="/portfolio" id="hero-cta" class="group relative px-8 py-4 overflow-hidden rounded-full border border-earth-800 text-earth-900 chill-transition hover:text-earth-100 hover:shadow-xl hover:shadow-earth-400/20">
           <span class="relative z-10 font-medium uppercase tracking-widest text-sm">View Portfolio</span>
-          <div class="absolute inset-0 h-full w-full bg-earth-800 transform scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100 z-0"></div>
+          <div class="absolute inset-0 h-full w-full bg-earth-800 transform scale-x-0 origin-left transition-transform duration-700 ease-out group-hover:scale-x-100 z-0"></div>
         </a>
-        <a href="/blog" class="relative group">
-          <span class="text-earth-800 uppercase tracking-widest text-sm font-medium">Read Journal</span>
-          <div class="absolute -bottom-1 left-0 w-full h-[1px] bg-earth-400 group-hover:bg-earth-800 transition-colors"></div>
+        <a href="/blog" class="relative group py-2">
+          <span class="text-earth-800 uppercase tracking-widest text-sm font-medium chill-transition group-hover:text-earth-900">Read Journal</span>
+          <div class="absolute bottom-0 left-0 w-0 h-[1px] bg-earth-400 group-hover:w-full group-hover:bg-earth-800 transition-all duration-700 ease-out"></div>
         </a>
       </div>
     </div>
@@ -48,23 +48,23 @@ try {
     <div class="md:col-span-4 flex flex-col justify-end border-t md:border-t-0 md:border-l border-earth-300 md:pl-8 pt-8 md:pt-0 animate-fade-up" style="animation-delay: 700ms;">
       <h2 class="text-xs uppercase tracking-[0.2em] text-earth-500 mb-6">Recent Musing</h2>
       
-      <div class="space-y-6">
+      <div class="space-y-6 group">
         {latestPost ? (
-            <div class="space-y-4">
+            <div class="space-y-4 hover-lift transition-opacity duration-700 animate-fade-in" style="animation-delay: 800ms;">
                 {latestPost.image_path && (
-                    <div class="w-full h-48 overflow-hidden border border-earth-300 rounded-sm">
-                        <img src={`/api/media?path=${latestPost.image_path}`} class="w-full h-full object-cover grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                    <div class="w-full h-48 overflow-hidden rounded-sm">
+                        <img src={`/api/media?path=${latestPost.image_path}`} class="aesthetic-image w-full h-full object-cover" />
                     </div>
                 )}
                 <h3 class="text-xl font-light text-earth-900 leading-tight">
-                    <a href={`/blog/${latestPost.slug}`} class="hover:italic transition-all">{latestPost.title}</a>
+                    <a href={`/blog/${latestPost.slug}`} class="transition-all duration-500">{latestPost.title}</a>
                 </h3>
                 <p class="text-sm text-earth-700 font-light leading-relaxed line-clamp-3">
                     {latestPost.description}
                 </p>
             </div>
         ) : (
-            <div class="space-y-6">
+            <div class="space-y-6 animate-float">
                 <div class="w-16 h-16 rounded-full border border-earth-400 flex items-center justify-center opacity-50 mb-8 animate-scale-up" style="animation-delay: 800ms;">
                     <div class="w-8 h-8 rounded-full bg-earth-300"></div>
                 </div>
@@ -78,3 +78,25 @@ try {
 
   </main>
 </Layout>
+
+<script>
+  function setupMagnetic() {
+    const btn = document.getElementById('hero-cta');
+    if (!btn) return;
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      btn.style.transform = `translate(${x * 0.2}px, ${y * 0.3}px)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = `translate(0px, 0px)`;
+    });
+  }
+
+  setupMagnetic();
+  document.addEventListener('astro:page-load', setupMagnetic);
+</script>
