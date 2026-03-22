@@ -7,12 +7,26 @@ import Navigation from '../../components/Navigation.astro';
   <Navigation />
   
   <main class="flex-grow w-full max-w-4xl mx-auto px-6 py-12 space-y-12">
+    <!-- Auth Wall -->
+    <div id="auth-wall" class="fixed inset-0 z-[100] bg-earth-100 flex items-center justify-center p-6 hidden">
+        <div class="max-w-sm w-full space-y-8 text-center animate-fade-up">
+            <div class="space-y-2">
+                <h1 class="text-4xl font-light text-earth-900 tracking-tight">Restricted</h1>
+                <p class="text-earth-600 italic text-sm">Enter access key to initialize command center.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="access-key-input" class="w-full bg-transparent border-b border-earth-800 text-center text-2xl py-2 focus:outline-none placeholder:text-earth-300" placeholder="••••••••" />
+                <button id="auth-btn" class="w-full bg-earth-800 text-earth-100 py-3 uppercase tracking-widest text-xs font-bold hover:bg-earth-700 transition-all">Establish Connection</button>
+            </div>
+        </div>
+    </div>
+
     <header class="border-b border-earth-800 pb-8 flex justify-between items-end">
       <div>
         <h1 class="text-5xl font-light text-earth-900 tracking-tight">Admin Portal</h1>
         <p class="text-earth-600 italic">Command center for the digital outpost.</p>
       </div>
-      <div class="text-xs uppercase tracking-[0.2em] text-earth-400">Restricted Access</div>
+      <button id="logout-btn" class="text-[10px] uppercase tracking-[0.2em] text-earth-400 hover:text-earth-800 transition-colors">Terminate Session</button>
     </header>
 
     <section class="space-y-8 animate-fade-up">
@@ -99,6 +113,11 @@ import Navigation from '../../components/Navigation.astro';
   </main>
 
   <script>
+    const authWall = document.getElementById('auth-wall');
+    const authInput = document.getElementById('access-key-input');
+    const authBtn = document.getElementById('auth-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+
     const form = document.getElementById('admin-form');
     const typeSelect = document.getElementById('type');
     const titleLabel = document.getElementById('title-label');
@@ -114,6 +133,34 @@ import Navigation from '../../components/Navigation.astro';
     const viewPlacesBtn = document.getElementById('view-places');
 
     let currentView = 'post';
+
+    // Simple Auth Logic
+    const getStoredKey = () => localStorage.getItem('outpost_admin_key');
+    const setStoredKey = (key) => localStorage.setItem('outpost_admin_key', key);
+
+    const checkAuth = () => {
+        const key = getStoredKey();
+        if (!key) {
+            authWall.classList.remove('hidden');
+        } else {
+            authWall.classList.add('hidden');
+            fetchRecords();
+        }
+    };
+
+    authBtn.addEventListener('click', () => {
+        if (authInput.value) {
+            setStoredKey(authInput.value);
+            checkAuth();
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('outpost_admin_key');
+        location.reload();
+    });
+
+    checkAuth();
 
     typeSelect.addEventListener('change', () => {
         const type = typeSelect.value;
@@ -151,6 +198,7 @@ import Navigation from '../../components/Navigation.astro';
     viewPlacesBtn.addEventListener('click', () => setView('place'));
 
     async function fetchRecords() {
+      if (!getStoredKey()) return;
       recordsList.innerHTML = '<p class="text-earth-400 italic text-sm">Syncing...</p>';
       try {
         const res = await fetch(`/api/posts?type=${currentView}`);
@@ -171,8 +219,6 @@ import Navigation from '../../components/Navigation.astro';
       }
     }
 
-    fetchRecords();
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       status.classList.remove('hidden');
@@ -180,6 +226,9 @@ import Navigation from '../../components/Navigation.astro';
       status.className = 'mt-4 text-sm italic text-earth-600';
 
       const formData = new FormData(form);
+      // Inject the secret key
+      formData.append('key', getStoredKey());
+
       try {
         const res = await fetch('/api/posts', {
           method: 'POST',
@@ -199,6 +248,10 @@ import Navigation from '../../components/Navigation.astro';
       } catch (err) {
         status.textContent = 'Error: ' + err.message;
         status.className = 'mt-4 text-sm italic text-red-600';
+        if (err.message === 'Unauthorized Access') {
+            localStorage.removeItem('outpost_admin_key');
+            location.reload();
+        }
       }
     });
   </script>

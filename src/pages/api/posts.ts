@@ -4,9 +4,16 @@ import { env } from 'cloudflare:workers';
 export const POST: APIRoute = async ({ request }) => {
   const db = (env as any).OUTPOST_DB;
   const bucket = (env as any).OUTPOST_STORAGE;
+  const adminKey = (env as any).ADMIN_KEY;
 
   try {
     const data = await request.formData();
+    const providedKey = data.get('key') as string;
+
+    if (!adminKey || providedKey !== adminKey) {
+      return new Response(JSON.stringify({ error: 'Unauthorized Access' }), { status: 401 });
+    }
+
     const type = data.get('type') as string;
 
     if (type === 'place') {
