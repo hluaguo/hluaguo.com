@@ -99,9 +99,14 @@ import Navigation from '../../components/Navigation.astro';
             <textarea id="content" name="content" rows="10" required class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 font-mono text-sm focus:outline-none focus:border-earth-800 transition-colors"></textarea>
           </div>
 
-          <button type="submit" id="submit-btn" class="w-full bg-earth-800 text-earth-100 py-4 uppercase tracking-[0.2em] text-sm font-bold hover:bg-earth-700 transition-all shadow-lg">
-            Deploy to Outpost
-          </button>
+          <div class="flex gap-4">
+            <button type="submit" id="submit-btn" class="flex-grow bg-earth-800 text-earth-100 py-4 uppercase tracking-[0.2em] text-sm font-bold hover:bg-earth-700 transition-all shadow-lg">
+                Deploy to Outpost
+            </button>
+            <button type="button" id="delete-btn" class="hidden bg-red-900/10 text-red-900 border border-red-900/20 px-6 py-4 uppercase tracking-[0.2em] text-xs font-bold hover:bg-red-900 hover:text-white transition-all">
+                Delete
+            </button>
+          </div>
         </form>
 
         <div id="status" class="mt-4 text-sm italic hidden"></div>
@@ -129,18 +134,20 @@ import Navigation from '../../components/Navigation.astro';
     const authBtn = document.getElementById('auth-btn');
     const logoutBtn = document.getElementById('logout-btn');
 
+    const deleteBtn = document.getElementById('delete-btn');
+
     const form = document.getElementById('admin-form');
     const formTitle = document.getElementById('form-title');
     const cancelEditBtn = document.getElementById('cancel-edit');
-    const recordIdInput = document.getElementById('record-id');
-    const existingImagePathInput = document.getElementById('existing-image-path');
+    const recordIdInput = (document.getElementById('record-id') as HTMLInputElement);
+    const existingImagePathInput = (document.getElementById('existing-image-path') as HTMLInputElement);
     const currentImagePreview = document.getElementById('current-image-preview');
-    const previewImg = document.getElementById('preview-img');
+    const previewImg = (document.getElementById('preview-img') as HTMLImageElement);
 
-    const typeSelect = document.getElementById('type');
+    const typeSelect = (document.getElementById('type') as HTMLSelectElement);
     const titleLabel = document.getElementById('title-label');
     const extraLabel = document.getElementById('extra-label');
-    const extraInput = document.getElementById('extra');
+    const extraInput = (document.getElementById('extra') as HTMLInputElement);
     const standardFields = document.getElementById('standard-fields');
     const placeFields = document.getElementById('place-fields');
     const status = document.getElementById('status');
@@ -186,12 +193,12 @@ import Navigation from '../../components/Navigation.astro';
             titleLabel.textContent = 'Location Name';
             standardFields.classList.add('hidden');
             placeFields.classList.remove('hidden');
-            document.getElementById('slug').required = false;
+            (document.getElementById('slug') as HTMLInputElement).required = false;
         } else {
             titleLabel.textContent = 'Title';
             standardFields.classList.remove('hidden');
             placeFields.classList.add('hidden');
-            document.getElementById('slug').required = true;
+            (document.getElementById('slug') as HTMLInputElement).required = true;
             extraLabel.textContent = type === 'portfolio' ? 'Project Year' : 'Extra (Optional)';
             extraInput.placeholder = type === 'portfolio' ? '2026' : '';
         }
@@ -237,7 +244,7 @@ import Navigation from '../../components/Navigation.astro';
       }
     }
 
-    window.editRecord = async (id, type) => {
+    (window as any).editRecord = async (id, type) => {
         status.classList.remove('hidden');
         status.textContent = 'Fetching record details...';
         status.className = 'mt-4 text-sm italic text-earth-600';
@@ -246,21 +253,21 @@ import Navigation from '../../components/Navigation.astro';
             const res = await fetch(`/api/posts?id=${id}&type=${type}`);
             const record = await res.json();
             
-            form.reset();
+            (form as HTMLFormElement).reset();
             recordIdInput.value = record.id;
             typeSelect.value = type;
             typeSelect.dispatchEvent(new Event('change'));
             
-            document.getElementById('title').value = record.title || record.name || '';
-            document.getElementById('content').value = record.content || '';
+            (document.getElementById('title') as HTMLInputElement).value = record.title || record.name || '';
+            (document.getElementById('content') as HTMLTextAreaElement).value = record.content || '';
             
             if (type === 'place') {
-                document.getElementById('lat').value = record.lat || '';
-                document.getElementById('lng').value = record.lng || '';
+                (document.getElementById('lat') as HTMLInputElement).value = record.lat || '';
+                (document.getElementById('lng') as HTMLInputElement).value = record.lng || '';
             } else {
-                document.getElementById('slug').value = record.slug || '';
-                document.getElementById('description').value = record.description || '';
-                document.getElementById('extra').value = record.year || '';
+                (document.getElementById('slug') as HTMLInputElement).value = record.slug || '';
+                (document.getElementById('description') as HTMLTextAreaElement).value = record.description || '';
+                (document.getElementById('extra') as HTMLInputElement).value = record.year || '';
             }
 
             if (record.image_path) {
@@ -273,6 +280,7 @@ import Navigation from '../../components/Navigation.astro';
 
             formTitle.textContent = `Editing ${type === 'place' ? 'Pin' : 'Entry'}: ${record.title || record.name}`;
             cancelEditBtn.classList.remove('hidden');
+            deleteBtn.classList.remove('hidden');
             document.getElementById('submit-btn').textContent = 'Update Outpost';
             status.classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -283,14 +291,40 @@ import Navigation from '../../components/Navigation.astro';
     };
 
     cancelEditBtn.addEventListener('click', () => {
-        form.reset();
+        (form as HTMLFormElement).reset();
         recordIdInput.value = '';
         existingImagePathInput.value = '';
         currentImagePreview.classList.add('hidden');
         formTitle.textContent = 'Create New Entry';
         cancelEditBtn.classList.add('hidden');
+        deleteBtn.classList.add('hidden');
         document.getElementById('submit-btn').textContent = 'Deploy to Outpost';
         typeSelect.dispatchEvent(new Event('change'));
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to permanently remove this from the outpost?')) return;
+        
+        status.classList.remove('hidden');
+        status.textContent = 'Removing from cloud...';
+        status.className = 'mt-4 text-sm italic text-red-600';
+
+        try {
+            const res = await fetch(`/api/posts?id=${recordIdInput.value}&type=${typeSelect.value}&key=${getStoredKey()}`, {
+                method: 'DELETE'
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                status.textContent = 'Record successfully removed.';
+                cancelEditBtn.click();
+                fetchRecords();
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (err) {
+            status.textContent = 'Error deleting: ' + err.message;
+        }
     });
 
     form.addEventListener('submit', async (e) => {

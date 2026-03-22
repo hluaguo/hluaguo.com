@@ -105,3 +105,40 @@ export const GET: APIRoute = async ({ url }) => {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 };
+
+export const DELETE: APIRoute = async ({ request, url }) => {
+  const db = (env as any).OUTPOST_DB;
+  const bucket = (env as any).OUTPOST_STORAGE;
+  const adminKey = (env as any).ADMIN_KEY;
+
+  try {
+    const id = url.searchParams.get('id');
+    const type = url.searchParams.get('type');
+    const providedKey = url.searchParams.get('key');
+
+    if (!adminKey || providedKey !== adminKey) {
+      return new Response(JSON.stringify({ error: 'Unauthorized Access' }), { status: 401 });
+    }
+
+    if (!id || !type) {
+      return new Response(JSON.stringify({ error: 'Missing id or type' }), { status: 400 });
+    }
+
+    const table = type === 'place' ? 'places' : (type === 'post' ? 'posts' : 'portfolio');
+    
+    // 1. Fetch record to get file paths for cleanup
+    const record = await db.prepare(`SELECT * FROM ${table} WHERE id = ?`).bind(id).first();
+    if (!record) return new Response(JSON.stringify({ error: 'Record not found' }), { status: 404 });
+
+    // 2. Delete from R2
+    if (record.content_path) await bucket.delete(record.content_path);
+    if (record.image_path) await bucket.delete(record.image_path);
+
+    // 3. Delete from D1
+    await db.prepare(`DELETE FROM ${table} WHERE id = ?`).bind(id).run();
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (err: any) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  }
+};
