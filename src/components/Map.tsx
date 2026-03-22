@@ -1,22 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
-// Fix for missing marker icons in Leaflet with Vite
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 // Sample places data
 const places = [
@@ -26,6 +10,33 @@ const places = [
 ];
 
 export default function ExploredMap() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Only run on client
+    import('leaflet').then((L) => {
+      // Fix for missing marker icons in Leaflet with Vite
+      // @ts-ignore
+      import('leaflet/dist/images/marker-icon.png').then((icon) => {
+        // @ts-ignore
+        import('leaflet/dist/images/marker-shadow.png').then((iconShadow) => {
+          const DefaultIcon = L.default.icon({
+            iconUrl: icon.default,
+            shadowUrl: iconShadow.default,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+          });
+          L.default.Marker.prototype.options.icon = DefaultIcon;
+          setIsReady(true);
+        });
+      });
+    });
+  }, []);
+
+  if (!isReady) return <div className="h-[650px] w-full bg-earth-200 animate-pulse flex items-center justify-center italic text-earth-500">Initializing Atlas...</div>;
+
   return (
     <div className="h-[650px] w-full bg-earth-200 relative group">
       {/* Decorative corner brackets */}
