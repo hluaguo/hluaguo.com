@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --color-earth-100: #f4f0ea; /* Slightly warmer/softer base */
+  --color-earth-200: #e2d7ce;
+  --color-earth-300: #d0bdae;
+  --color-earth-400: #bca08d;
+  --color-earth-500: #a4816c;
+  --color-earth-600: #8c6753;
+  --color-earth-700: #705040;
+  --color-earth-800: #543b2f;
+  --color-earth-900: #38261e;
+
+  --font-serif: "Roboto Serif", serif;
+
+  --animate-fade-up: fade-up 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
+  --animate-fade-in: fade-in 1.5s cubic-bezier(0.19, 1, 0.22, 1) both;
+  --animate-scale-up: scale-up 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
+
+  @keyframes fade-up {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    0% { opacity: 0; filter: blur(4px); }
+    100% { opacity: 1; filter: blur(0); }
+  }
+  @keyframes scale-up {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-earth-100);
+    color: var(--color-earth-900);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Make the map look more editorial/vintage */
+  .leaflet-container {
+    background: var(--color-earth-200) !important;
+    font-family: var(--font-serif) !important;
+  }
+  .leaflet-layer,
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out,
+  .leaflet-control-attribution {
+    filter: sepia(0.2) contrast(0.95) opacity(0.9);
+  }
+  
+  ::selection {
+    background-color: var(--color-earth-800);
+    color: var(--color-earth-100);
+  }
+}
+
+/* Custom utilities */
+.text-balance {
+  text-wrap: balance;
+}
