@@ -1,45 +1,53 @@
 ---
-import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Navigation from '../../components/Navigation.astro';
+import { Marked } from 'marked';
 
-export async function getStaticPaths() {
-  const blogEntries = await getCollection('blog');
-  return blogEntries.map(entry => ({
-    params: { slug: entry.id }, props: { entry },
-  }));
+const { slug } = Astro.params;
+const runtime = Astro.locals.runtime;
+const db = runtime.env.OUTPOST_DB;
+const bucket = runtime.env.OUTPOST_ASSETS;
+
+// 1. Fetch metadata from D1
+const post = await db.prepare('SELECT * FROM posts WHERE slug = ? AND is_published = 1').bind(slug).first();
+
+if (!post) {
+  return Astro.redirect('/404');
 }
 
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+// 2. Fetch content from R2
+const contentObject = await bucket.get(post.content_path);
+
+if (!contentObject) {
+    return Astro.redirect('/404');
+}
+
+const rawContent = await contentObject.text();
+
+// 3. Parse Markdown
+const marked = new Marked();
+const htmlContent = marked.parse(rawContent);
 ---
 
-<Layout title={`${entry.data.title} - Hugo Lau`}>
+<Layout title={`${post.title} - Hugo Lau`}>
   <Navigation />
-  <main class="flex-grow max-w-3xl mx-auto px-6 md:px-12 pb-24 w-full">
+  <main class="flex-grow w-full max-w-3xl mx-auto px-6 md:px-12 py-12 md:py-24 relative z-10">
     
-    <header class="space-y-6 mb-12 pb-8 border-b border-earth-300">
-      <div class="flex items-center text-earth-600 space-x-4 mb-4">
-        <a href="/blog" class="hover:text-earth-800 transition-colors">&larr; Back to Blog</a>
+    <header class="space-y-6 mb-16 pb-12 border-b border-earth-300">
+      <div class="flex items-center text-earth-500 space-x-4 mb-4 text-xs uppercase tracking-widest font-medium">
+        <a href="/blog" class="hover:text-earth-900 transition-colors">&larr; Back to Journal</a>
       </div>
-      <h1 class="text-4xl md:text-5xl font-bold text-earth-800 leading-tight">{entry.data.title}</h1>
-      <div class="flex items-center text-sm text-earth-600 space-x-4">
-        <time datetime={entry.data.pubDate.toISOString()}>
-          {entry.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      <h1 class="text-5xl md:text-7xl font-light text-earth-900 leading-[1.1] tracking-tight">{post.title}</h1>
+      <div class="flex items-center text-sm text-earth-600 space-x-6 italic">
+        <time datetime={new Date(post.pubDate).toISOString()}>
+          {new Date(post.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         </time>
-        {entry.data.tags && (
-          <div class="flex space-x-2">
-            {entry.data.tags.map(tag => (
-              <span class="bg-earth-300 text-earth-800 px-2 py-0.5 rounded-full text-xs font-medium">#{tag}</span>
-            ))}
-          </div>
-        )}
+        <span class="text-earth-300 font-light">/</span>
+        <span class="text-xs uppercase tracking-[0.2em] font-bold text-earth-400">Published from Outpost</span>
       </div>
     </header>
 
-    <article class="prose prose-earth max-w-none prose-headings:font-bold prose-headings:text-earth-900 prose-p:text-earth-800 prose-a:text-earth-700 prose-a:underline prose-li:text-earth-800 prose-strong:text-earth-900">
-      <Content />
-    </article>
+    <article class="prose prose-earth prose-lg max-w-none prose-headings:font-light prose-headings:tracking-tight prose-p:font-light prose-p:leading-relaxed prose-a:italic prose-blockquote:border-l-earth-300 prose-blockquote:italic" set:html={htmlContent} />
 
   </main>
 </Layout>

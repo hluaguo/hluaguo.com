@@ -1,0 +1,26 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hluaguo-com",
+	"main": ".astro/dist/server/entry.mjs",
+	"compatibility_date": "2024-03-22",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"pages_build_output_dir": "./dist",
+	"r2_buckets": [
+		{
+			"binding": "OUTPOST_ASSETS",
+			"bucket_name": "hluaguo-outpost-assets"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "OUTPOST_DB",
+			"database_name": "hluaguo-outpost-db",
+			"database_id": "7ae5189e-654a-45de-b563-fdea0d025c2f"
+		}
+	],
+	"observability": {
+		"enabled": true
+	}
+}

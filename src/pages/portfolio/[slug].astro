@@ -1,48 +1,62 @@
 ---
-import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Navigation from '../../components/Navigation.astro';
+import { Marked } from 'marked';
 
-export async function getStaticPaths() {
-  const portfolioEntries = await getCollection('portfolio');
-  return portfolioEntries.map(entry => ({
-    params: { slug: entry.id }, props: { entry },
-  }));
+const { slug } = Astro.params;
+const runtime = Astro.locals.runtime;
+const db = runtime.env.OUTPOST_DB;
+const bucket = runtime.env.OUTPOST_ASSETS;
+
+// 1. Fetch metadata from D1
+const project = await db.prepare('SELECT * FROM portfolio WHERE slug = ? AND is_published = 1').bind(slug).first();
+
+if (!project) {
+  return Astro.redirect('/404');
 }
 
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+// 2. Fetch content from R2
+const contentObject = await bucket.get(project.content_path);
+if (!contentObject) {
+    return Astro.redirect('/404');
+}
+const rawContent = await contentObject.text();
+
+// 3. Parse Markdown
+const marked = new Marked();
+const htmlContent = marked.parse(rawContent);
 ---
 
-<Layout title={`${entry.data.title} - Hugo Lau`}>
+<Layout title={`${project.title} - Hugo Lau`}>
   <Navigation />
-  <main class="flex-grow max-w-3xl mx-auto px-6 md:px-12 pb-24 w-full">
+  <main class="flex-grow w-full max-w-3xl mx-auto px-6 md:px-12 py-12 md:py-24 relative z-10">
     
-    <header class="space-y-6 mb-12 pb-8 border-b border-earth-300">
-      <div class="flex items-center text-earth-600 space-x-4 mb-4">
+    <header class="space-y-6 mb-16 pb-8 border-b border-earth-300">
+      <div class="flex items-center text-earth-500 space-x-4 mb-4 text-xs uppercase tracking-widest font-medium">
         <a href="/portfolio" class="hover:text-earth-800 transition-colors">&larr; Back to Portfolio</a>
       </div>
       
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <h1 class="text-4xl md:text-5xl font-bold text-earth-800 leading-tight">{entry.data.title}</h1>
-        <span class="text-xl text-earth-500 font-medium bg-earth-200 px-3 py-1 rounded-md">{entry.data.year}</span>
+        <h1 class="text-5xl md:text-7xl font-light text-earth-900 leading-tight tracking-tight">{project.title}</h1>
+        <span class="text-xl text-earth-400 font-light italic">{project.year}</span>
       </div>
 
-      <div class="flex items-center gap-4 pt-2 flex-wrap">
-        {entry.data.link && (
-          <a href={entry.data.link} target="_blank" rel="noopener noreferrer" class="bg-earth-800 text-earth-100 px-4 py-2 rounded-md font-medium hover:bg-earth-700 transition-colors inline-flex items-center gap-2">
-            Visit Project
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+      <div class="flex items-center gap-4 pt-4">
+        {project.link && (
+          <a href={project.link} target="_blank" rel="noopener noreferrer" class="group relative px-4 py-2 overflow-hidden border border-earth-800 text-earth-900 transition-colors hover:text-earth-100">
+            <span class="relative z-10 font-medium uppercase tracking-widest text-xs inline-flex items-center gap-2">
+                Visit Project
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            </span>
+            <div class="absolute inset-0 h-full w-full bg-earth-800 transform scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100 z-0"></div>
           </a>
         )}
       </div>
     </header>
 
-    <article class="prose prose-earth max-w-none prose-headings:font-bold prose-headings:text-earth-900 prose-p:text-earth-800 prose-a:text-earth-700 prose-a:underline prose-li:text-earth-800 prose-strong:text-earth-900 prose-ul:list-disc prose-ol:list-decimal">
-      <Content />
-    </article>
+    <article class="prose prose-earth prose-lg max-w-none prose-headings:font-light prose-headings:tracking-tight prose-p:font-light prose-p:leading-relaxed" set:html={htmlContent} />
 
   </main>
 </Layout>

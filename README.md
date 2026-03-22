@@ -25,6 +25,10 @@ pnpm run build
 
 ## Content Management
 
-- **Journal:** Add markdown files to `src/content/blog/`
-- **Portfolio:** Add markdown files to `src/content/portfolio/`
-- **Atlas (Map):** Update the `places` array inside `src/components/Map.tsx`
+- **Admin Portal:** Manage your journal and portfolio at `/admin` (requires Cloudflare environment).
+- **Storage:** Metadata in **Cloudflare D1**, content in **Cloudflare R2**.
+- **Atlas (Map):** Update the `places` array inside `src/components/Map.tsx`.
+
+## Deployment
+
+Deploy to Cloudflare Pages. Ensure the `OUTPOST_DB` and `OUTPOST_ASSETS` bindings are configured in the Cloudflare Dashboard under **Pages > Settings > Functions > Compatibility flags / Bindings**.
