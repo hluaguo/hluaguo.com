@@ -24,7 +24,6 @@ export default defineConfig({
   },
   adapter: cloudflare({
     imageService: 'cloudflare',
-    configPath: './wrangler.jsonc',
     platformProxy: {
         enabled: true
     }
