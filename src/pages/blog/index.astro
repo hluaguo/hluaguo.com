@@ -41,6 +41,12 @@ try {
               {post.title}
             </h2>
             
+            {post.image_path && (
+                <div class="w-full h-64 md:h-80 overflow-hidden border border-earth-300">
+                    <img src={`/api/media?path=${post.image_path}`} class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                </div>
+            )}
+
             <p class="text-earth-700 font-light text-lg leading-relaxed max-w-2xl">
               {post.description}
             </p>

@@ -1,6 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
+import { env } from 'cloudflare:workers';
+
+const db = (env as any).OUTPOST_DB;
+let latestPost = null;
+try {
+  latestPost = await db.prepare('SELECT * FROM posts WHERE is_published = 1 ORDER BY pubDate DESC LIMIT 1').first();
+} catch (e) {}
 ---
 
 <Layout title="Hugo Lau">
@@ -39,17 +46,33 @@ import Navigation from '../components/Navigation.astro';
 
     <!-- Right Column: Accent Sidebar/Recent Musings -->
     <div class="md:col-span-4 flex flex-col justify-end border-t md:border-t-0 md:border-l border-earth-300 md:pl-8 pt-8 md:pt-0 animate-fade-up" style="animation-delay: 700ms;">
-      <h2 class="text-xs uppercase tracking-[0.2em] text-earth-500 mb-6">Recent Musings</h2>
+      <h2 class="text-xs uppercase tracking-[0.2em] text-earth-500 mb-6">Recent Musing</h2>
       
       <div class="space-y-6">
-        <!-- Abstract shape / decorative element -->
-        <div class="w-16 h-16 rounded-full border border-earth-400 flex items-center justify-center opacity-50 mb-8 animate-scale-up" style="animation-delay: 800ms;">
-           <div class="w-8 h-8 rounded-full bg-earth-300"></div>
-        </div>
-
-        <p class="text-lg text-earth-700 font-light leading-relaxed">
-          I document my thoughts on software architecture, travel guides, and random discoveries in my <a href="/blog" class="italic text-earth-900 hover:text-earth-600 transition-colors underline decoration-earth-300 decoration-1 underline-offset-4">journal</a>.
-        </p>
+        {latestPost ? (
+            <div class="space-y-4">
+                {latestPost.image_path && (
+                    <div class="w-full h-48 overflow-hidden border border-earth-300 rounded-sm">
+                        <img src={`/api/media?path=${latestPost.image_path}`} class="w-full h-full object-cover grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-700" />
+                    </div>
+                )}
+                <h3 class="text-xl font-light text-earth-900 leading-tight">
+                    <a href={`/blog/${latestPost.slug}`} class="hover:italic transition-all">{latestPost.title}</a>
+                </h3>
+                <p class="text-sm text-earth-700 font-light leading-relaxed line-clamp-3">
+                    {latestPost.description}
+                </p>
+            </div>
+        ) : (
+            <div class="space-y-6">
+                <div class="w-16 h-16 rounded-full border border-earth-400 flex items-center justify-center opacity-50 mb-8 animate-scale-up" style="animation-delay: 800ms;">
+                    <div class="w-8 h-8 rounded-full bg-earth-300"></div>
+                </div>
+                <p class="text-lg text-earth-700 font-light leading-relaxed">
+                    I document my thoughts on software architecture, travel guides, and random discoveries in my <a href="/blog" class="italic text-earth-900 hover:text-earth-600 transition-colors underline decoration-earth-300 decoration-1 underline-offset-4">journal</a>.
+                </p>
+            </div>
+        )}
       </div>
     </div>
 

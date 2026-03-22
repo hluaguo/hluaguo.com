@@ -41,6 +41,12 @@ const htmlContent = marked.parse(rawContent);
         <span class="text-xl text-earth-400 font-light italic">{project.year}</span>
       </div>
 
+      {project.image_path && (
+        <div class="w-full h-[400px] md:h-[500px] overflow-hidden border border-earth-300">
+            <img src={`/api/media?path=${project.image_path}`} class="w-full h-full object-cover" />
+        </div>
+      )}
+
       <div class="flex items-center gap-4 pt-4">
         {project.link && (
           <a href={project.link} target="_blank" rel="noopener noreferrer" class="group relative px-4 py-2 overflow-hidden border border-earth-800 text-earth-900 transition-colors hover:text-earth-100">

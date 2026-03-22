@@ -31,9 +31,15 @@ import Navigation from '../../components/Navigation.astro';
 
     <section class="space-y-8 animate-fade-up">
       <div class="bg-earth-200/50 border border-earth-300 p-8 rounded-lg shadow-inner">
-        <h2 class="text-2xl font-light text-earth-800 mb-8 border-b border-earth-300 pb-4 uppercase tracking-widest text-sm">Create New Entry</h2>
+        <div class="flex justify-between items-center mb-8 border-b border-earth-300 pb-4">
+            <h2 id="form-title" class="text-2xl font-light text-earth-800 uppercase tracking-widest text-sm">Create New Entry</h2>
+            <button id="cancel-edit" class="text-[10px] uppercase tracking-widest text-earth-500 hover:text-earth-800 hidden">Cancel Edit &larr;</button>
+        </div>
         
         <form id="admin-form" class="space-y-6">
+          <input type="hidden" id="record-id" name="id" />
+          <input type="hidden" id="existing-image-path" name="existing_image_path" />
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="flex flex-col gap-2">
               <label for="type" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Entry Type</label>
@@ -77,10 +83,15 @@ import Navigation from '../../components/Navigation.astro';
                 <input type="text" id="lng" name="lng" class="bg-earth-100 border border-earth-300 px-4 py-2 text-earth-900 focus:outline-none focus:border-earth-800 transition-colors" placeholder="135.7681" />
               </div>
             </div>
-            <div class="flex flex-col gap-2">
-              <label for="image" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Memory Image (Upload to R2)</label>
-              <input type="file" id="image" name="image" accept="image/*" class="text-sm text-earth-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-earth-800 file:text-earth-100 hover:file:bg-earth-700" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="image" class="text-xs uppercase tracking-widest text-earth-500 font-bold">Featured Image (Upload to R2)</label>
+            <div id="current-image-preview" class="hidden mb-4 p-4 border border-earth-300 bg-earth-100 rounded flex items-center gap-4">
+                <img id="preview-img" src="" class="w-20 h-20 object-cover border border-earth-300" />
+                <span class="text-xs text-earth-500 italic">Current image on cloud. Upload new to replace.</span>
             </div>
+            <input type="file" id="image" name="image" accept="image/*" class="text-sm text-earth-700 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-earth-800 file:text-earth-100 hover:file:bg-earth-700" />
           </div>
 
           <div class="flex flex-col gap-2">
@@ -119,6 +130,13 @@ import Navigation from '../../components/Navigation.astro';
     const logoutBtn = document.getElementById('logout-btn');
 
     const form = document.getElementById('admin-form');
+    const formTitle = document.getElementById('form-title');
+    const cancelEditBtn = document.getElementById('cancel-edit');
+    const recordIdInput = document.getElementById('record-id');
+    const existingImagePathInput = document.getElementById('existing-image-path');
+    const currentImagePreview = document.getElementById('current-image-preview');
+    const previewImg = document.getElementById('preview-img');
+
     const typeSelect = document.getElementById('type');
     const titleLabel = document.getElementById('title-label');
     const extraLabel = document.getElementById('extra-label');
@@ -206,11 +224,11 @@ import Navigation from '../../components/Navigation.astro';
         if (data.error) throw new Error(data.error);
 
         recordsList.innerHTML = data.map(p => `
-          <div class="flex justify-between items-center py-3 border-b border-earth-200 group">
+          <div class="flex justify-between items-center py-3 border-b border-earth-200 group hover:bg-earth-200/20 px-2 transition-colors cursor-pointer" onclick="window.editRecord('${p.id}', '${currentView}')">
             <span class="text-earth-800 font-light">${p.title || p.name}</span>
             <div class="flex gap-4 items-center">
               <span class="text-[10px] uppercase tracking-widest text-earth-400 italic">${currentView === 'place' ? `${p.lat}, ${p.lng}` : (currentView === 'post' ? new Date(p.pubDate).toLocaleDateString() : p.year)}</span>
-              <span class="text-xs text-earth-500 px-2 py-1 bg-earth-300 rounded uppercase tracking-tighter">Live</span>
+              <span class="text-[10px] text-earth-500 opacity-0 group-hover:opacity-100 transition-opacity">Click to Edit &rarr;</span>
             </div>
           </div>
         `).join('') || '<p class="text-earth-400 italic">No records found.</p>';
@@ -219,6 +237,62 @@ import Navigation from '../../components/Navigation.astro';
       }
     }
 
+    window.editRecord = async (id, type) => {
+        status.classList.remove('hidden');
+        status.textContent = 'Fetching record details...';
+        status.className = 'mt-4 text-sm italic text-earth-600';
+        
+        try {
+            const res = await fetch(`/api/posts?id=${id}&type=${type}`);
+            const record = await res.json();
+            
+            form.reset();
+            recordIdInput.value = record.id;
+            typeSelect.value = type;
+            typeSelect.dispatchEvent(new Event('change'));
+            
+            document.getElementById('title').value = record.title || record.name || '';
+            document.getElementById('content').value = record.content || '';
+            
+            if (type === 'place') {
+                document.getElementById('lat').value = record.lat || '';
+                document.getElementById('lng').value = record.lng || '';
+            } else {
+                document.getElementById('slug').value = record.slug || '';
+                document.getElementById('description').value = record.description || '';
+                document.getElementById('extra').value = record.year || '';
+            }
+
+            if (record.image_path) {
+                existingImagePathInput.value = record.image_path;
+                previewImg.src = `/api/media?path=${record.image_path}`;
+                currentImagePreview.classList.remove('hidden');
+            } else {
+                currentImagePreview.classList.add('hidden');
+            }
+
+            formTitle.textContent = `Editing ${type === 'place' ? 'Pin' : 'Entry'}: ${record.title || record.name}`;
+            cancelEditBtn.classList.remove('hidden');
+            document.getElementById('submit-btn').textContent = 'Update Outpost';
+            status.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            status.textContent = 'Error fetching record.';
+            status.className = 'mt-4 text-sm italic text-red-600';
+        }
+    };
+
+    cancelEditBtn.addEventListener('click', () => {
+        form.reset();
+        recordIdInput.value = '';
+        existingImagePathInput.value = '';
+        currentImagePreview.classList.add('hidden');
+        formTitle.textContent = 'Create New Entry';
+        cancelEditBtn.classList.add('hidden');
+        document.getElementById('submit-btn').textContent = 'Deploy to Outpost';
+        typeSelect.dispatchEvent(new Event('change'));
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       status.classList.remove('hidden');
@@ -226,7 +300,6 @@ import Navigation from '../../components/Navigation.astro';
       status.className = 'mt-4 text-sm italic text-earth-600';
 
       const formData = new FormData(form);
-      // Inject the secret key
       formData.append('key', getStoredKey());
 
       try {
@@ -237,10 +310,9 @@ import Navigation from '../../components/Navigation.astro';
         const result = await res.json();
 
         if (result.success) {
-          status.textContent = 'Record successfully deployed!';
+          status.textContent = 'Success! Your changes are live.';
           status.className = 'mt-4 text-sm italic text-green-600 font-bold';
-          form.reset();
-          typeSelect.dispatchEvent(new Event('change'));
+          cancelEditBtn.click();
           fetchRecords();
         } else {
           throw new Error(result.error);

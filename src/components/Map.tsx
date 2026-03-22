@@ -4,10 +4,10 @@ export default function ExploredMap() {
   const [MapComponents, setMapComponents] = useState<any>(null);
   const [L, setL] = useState<any>(null);
   const [places, setPlaces] = useState<any[]>([]);
+  const [zoom, setZoom] = useState(2);
 
   useEffect(() => {
     const loadMapAndData = async () => {
-      // 1. Fetch dynamic places from D1 API
       try {
         const response = await fetch('/api/posts?type=place');
         const data = await response.json();
@@ -16,20 +16,10 @@ export default function ExploredMap() {
         console.error("Failed to load places:", e);
       }
 
-      // 2. Load Leaflet components
       const [Leaflet, ReactLeaflet] = await Promise.all([
         import('leaflet'),
         import('react-leaflet'),
       ]);
-
-      // Fix for icons using CDN
-      // @ts-ignore
-      delete Leaflet.default.Icon.Default.prototype._getIconUrl;
-      Leaflet.default.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      });
 
       await import('leaflet/dist/leaflet.css');
 
@@ -48,10 +38,58 @@ export default function ExploredMap() {
     );
   }
 
-  const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
+  const { MapContainer, TileLayer, Marker, Popup, useMapEvents } = MapComponents;
+
+  // Track zoom level to scale pins
+  function ZoomTracker() {
+    const map = useMapEvents({
+      zoomend: () => {
+        setZoom(map.getZoom());
+      },
+    });
+    return null;
+  }
+
+  // Create a custom Image Marker Icon
+  const createPlaceIcon = (place: any) => {
+    const size = Math.max(30, Math.min(80, zoom * 15)); // Scale size based on zoom
+    const imageUrl = place.image_path ? `/api/media?path=${place.image_path}` : null;
+
+    if (imageUrl) {
+      return L.divIcon({
+        className: 'custom-image-marker',
+        html: `
+          <div class="relative group" style="width: ${size}px; height: ${size}px;">
+            <div class="absolute inset-0 rounded-full border-2 border-earth-800 bg-earth-200 overflow-hidden shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <img src="${imageUrl}" class="w-full h-full object-cover" />
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-earth-800 rounded-full border border-earth-100 shadow-sm"></div>
+          </div>
+        `,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size],
+        popupAnchor: [0, -size],
+      });
+    }
+
+    // Default pin for places without images
+    return L.divIcon({
+      className: 'custom-pin-marker',
+      html: `
+        <div class="flex flex-col items-center">
+          <div class="w-4 h-4 bg-earth-800 rounded-full border-2 border-earth-100 shadow-md"></div>
+          <div class="w-0.5 h-3 bg-earth-800 shadow-sm"></div>
+        </div>
+      `,
+      iconSize: [16, 28],
+      iconAnchor: [8, 28],
+      popupAnchor: [0, -28],
+    });
+  };
 
   return (
     <div className="h-[650px] w-full bg-earth-200 relative group overflow-hidden border border-earth-300">
+      {/* Decorative corner brackets */}
       <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-earth-800 z-50 pointer-events-none"></div>
       <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-earth-800 z-50 pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-earth-800 z-50 pointer-events-none"></div>
@@ -61,14 +99,19 @@ export default function ExploredMap() {
         center={[25, 10]} 
         zoom={2} 
         scrollWheelZoom={false} 
-        className="h-full w-full opacity-90 transition-opacity duration-1000 group-hover:opacity-100"
+        className="h-full w-full opacity-95 transition-opacity duration-1000 group-hover:opacity-100"
       >
+        <ZoomTracker />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {places.map((place) => (
-          <Marker key={place.id} position={[place.lat, place.lng]}>
+          <Marker 
+            key={place.id} 
+            position={[place.lat, place.lng]}
+            icon={createPlaceIcon(place)}
+          >
             <Popup minWidth={250} className="custom-popup">
               <div className="font-serif bg-earth-100 -m-1 overflow-hidden rounded-sm">
                 {place.image_path && (
@@ -76,7 +119,7 @@ export default function ExploredMap() {
                         <img 
                             src={`/api/media?path=${place.image_path}`} 
                             alt={place.name} 
-                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" 
+                            className="w-full h-full object-cover" 
                         />
                     </div>
                 )}
