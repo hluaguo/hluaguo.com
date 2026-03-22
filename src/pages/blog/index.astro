@@ -1,9 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navigation from '../../components/Navigation.astro';
+import { env } from 'cloudflare:workers';
 
-const runtime = Astro.locals.runtime;
-const db = runtime.env.OUTPOST_DB;
+const db = (env as any).OUTPOST_DB;
 
 let posts = [];
 try {

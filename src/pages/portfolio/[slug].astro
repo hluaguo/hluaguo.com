@@ -2,11 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import Navigation from '../../components/Navigation.astro';
 import { Marked } from 'marked';
+import { env } from 'cloudflare:workers';
 
 const { slug } = Astro.params;
-const runtime = Astro.locals.runtime;
-const db = runtime.env.OUTPOST_DB;
-const bucket = runtime.env.OUTPOST_ASSETS;
+const db = (env as any).OUTPOST_DB;
+const bucket = (env as any).OUTPOST_ASSETS;
 
 // 1. Fetch metadata from D1
 const project = await db.prepare('SELECT * FROM portfolio WHERE slug = ? AND is_published = 1').bind(slug).first();

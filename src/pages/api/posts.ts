@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const runtime = locals.runtime;
-  const db = runtime.env.OUTPOST_DB;
-  const bucket = runtime.env.OUTPOST_ASSETS;
+export const POST: APIRoute = async ({ request }) => {
+  const db = (env as any).OUTPOST_DB;
+  const bucket = (env as any).OUTPOST_ASSETS;
 
   try {
     const data = await request.formData();
@@ -54,9 +54,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 };
 
-export const GET: APIRoute = async ({ url, locals }) => {
-  const runtime = locals.runtime;
-  const db = runtime.env.OUTPOST_DB;
+export const GET: APIRoute = async ({ url }) => {
+  const db = (env as any).OUTPOST_DB;
   const type = url.searchParams.get('type') || 'post';
 
   try {
