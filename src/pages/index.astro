@@ -1,17 +1,57 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Hugo Lau">
+  <Navigation />
+  
+  <main class="flex-grow w-full max-w-6xl mx-auto px-6 md:px-12 py-12 md:py-24 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 relative z-10">
+    
+    <!-- Left Column: Giant Typography & Intro -->
+    <div class="md:col-span-8 flex flex-col justify-center space-y-12">
+      <div class="space-y-4">
+        <h1 class="text-6xl md:text-8xl lg:text-[7rem] font-light text-earth-900 leading-[0.9] tracking-tight animate-fade-up" style="animation-delay: 300ms;">
+          Hello, <br />
+          I'm Hugo.
+        </h1>
+        <p class="text-3xl md:text-5xl font-light italic text-earth-600 animate-fade-up" style="animation-delay: 400ms;">
+          I build things and explore the world.
+        </p>
+      </div>
+
+      <p class="text-xl md:text-2xl text-earth-800 leading-relaxed font-light max-w-2xl text-balance animate-fade-up" style="animation-delay: 500ms;">
+        Welcome to my digital outpost. I'm passionate about crafting elegant software, 
+        traveling to new places, and collecting my experiences along the way.
+      </p>
+
+      <div class="flex items-center gap-8 pt-8 animate-fade-up" style="animation-delay: 600ms;">
+        <a href="/portfolio" class="group relative px-6 py-3 overflow-hidden rounded-full border border-earth-800 text-earth-900 transition-colors hover:text-earth-100">
+          <span class="relative z-10 font-medium uppercase tracking-widest text-sm">View Portfolio</span>
+          <div class="absolute inset-0 h-full w-full bg-earth-800 transform scale-x-0 origin-left transition-transform duration-500 ease-out group-hover:scale-x-100 z-0"></div>
+        </a>
+        <a href="/blog" class="relative group">
+          <span class="text-earth-800 uppercase tracking-widest text-sm font-medium">Read Journal</span>
+          <div class="absolute -bottom-1 left-0 w-full h-[1px] bg-earth-400 group-hover:bg-earth-800 transition-colors"></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Accent Sidebar/Recent Musings -->
+    <div class="md:col-span-4 flex flex-col justify-end border-t md:border-t-0 md:border-l border-earth-300 md:pl-8 pt-8 md:pt-0 animate-fade-up" style="animation-delay: 700ms;">
+      <h2 class="text-xs uppercase tracking-[0.2em] text-earth-500 mb-6">Recent Musings</h2>
+      
+      <div class="space-y-6">
+        <!-- Abstract shape / decorative element -->
+        <div class="w-16 h-16 rounded-full border border-earth-400 flex items-center justify-center opacity-50 mb-8 animate-scale-up" style="animation-delay: 800ms;">
+           <div class="w-8 h-8 rounded-full bg-earth-300"></div>
+        </div>
+
+        <p class="text-lg text-earth-700 font-light leading-relaxed">
+          I document my thoughts on software architecture, travel guides, and random discoveries in my <a href="/blog" class="italic text-earth-900 hover:text-earth-600 transition-colors underline decoration-earth-300 decoration-1 underline-offset-4">journal</a>.
+        </p>
+      </div>
+    </div>
+
+  </main>
+</Layout>
