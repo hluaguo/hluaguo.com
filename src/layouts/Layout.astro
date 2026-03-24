@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import GlowBackground from '../components/GlowBackground.astro';
-import Particles from '../components/Particles.astro';
+import WebGLBackground from '../components/WebGLBackground.astro';
 
 interface Props {
 	title: string;
@@ -28,7 +28,7 @@ const { title, description = "Hugo Lau's Personal Website and Digital Outpost" }
 	</head>
 	<body class="min-h-screen flex flex-col relative overflow-x-hidden bg-earth-100 selection:bg-earth-800 selection:text-earth-100">
 		<GlowBackground />
-		<Particles />
+		<WebGLBackground />
 		
 		<!-- Dimmed Grid Background -->
 		<div class="pointer-events-none fixed inset-0 z-0 dimmed-grid opacity-[0.3]"></div>
