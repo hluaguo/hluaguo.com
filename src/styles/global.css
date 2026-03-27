@@ -2,17 +2,23 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-earth-100: #f4f0ea; /* Slightly warmer/softer base */
-  --color-earth-200: #e2d7ce;
-  --color-earth-300: #d0bdae;
-  --color-earth-400: #bca08d;
-  --color-earth-500: #a4816c;
-  --color-earth-600: #8c6753;
-  --color-earth-700: #705040;
-  --color-earth-800: #543b2f;
-  --color-earth-900: #38261e;
+  --color-earth-100: #f7f3ed; /* Softer cream */
+  --color-earth-200: #eee4d7;
+  --color-earth-300: #dfcfbc;
+  --color-earth-400: #c6a78d;
+  --color-earth-500: #a9846b;
+  --color-earth-600: #8d6b55;
+  --color-earth-700: #705342;
+  --color-earth-800: #543c30;
+  --color-earth-900: #382820;
 
-  --font-serif: "Roboto Serif", serif;
+  /* Accent colors */
+  --color-clay: #b2533e;
+  --color-moss: #5f6f52;
+  --color-slate-earth: #4b5563;
+
+  --font-serif: "Fraunces", serif;
+  --font-sans: "Inter", sans-serif;
 
   --animate-fade-up: fade-up 1.2s cubic-bezier(0.19, 1, 0.22, 1) both;
   --animate-fade-in: fade-in 1.5s cubic-bezier(0.19, 1, 0.22, 1) both;
@@ -23,7 +29,7 @@
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 
   @keyframes fade-up {
-    0% { opacity: 0; transform: translateY(30px); }
+    0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
   }
   @keyframes fade-in {
@@ -31,7 +37,7 @@
     100% { opacity: 1; filter: blur(0); }
   }
   @keyframes scale-up {
-    0% { opacity: 0; transform: scale(0.95); }
+    0% { opacity: 0; transform: scale(0.98); }
     100% { opacity: 1; transform: scale(1); }
   }
   @keyframes float {
@@ -44,9 +50,14 @@
   body {
     background-color: var(--color-earth-100);
     color: var(--color-earth-900);
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: var(--font-serif);
+    font-variant-ligatures: common-ligatures;
   }
 
   /* Make the map look more editorial/vintage */
@@ -58,7 +69,19 @@
   .leaflet-control-zoom-in,
   .leaflet-control-zoom-out,
   .leaflet-control-attribution {
-    filter: sepia(0.2) contrast(0.95) opacity(0.9);
+    filter: sepia(0.3) contrast(0.9) opacity(0.85);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-delay: -1ms !important;
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      background-attachment: initial !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
   }
 }
 
