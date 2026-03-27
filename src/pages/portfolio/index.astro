@@ -27,45 +27,43 @@ try {
       <span class="text-xs uppercase tracking-[0.2em] text-earth-500 mt-8 md:mt-0">Archive // Cloud Outpost</span>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-32">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-20 gap-y-24 md:gap-y-32">
       {projects.length > 0 ? projects.map((project, index) => (
         <article 
           class="group relative flex flex-col animate-fade-up" 
           style={`animation-delay: ${300 + (index * 100)}ms;`}
         >
-          <a href={`/portfolio/${project.slug}`} class="block space-y-8 hover-lift">
-            <div class="relative aspect-[16/10] overflow-hidden rounded-sm">
+          <a href={`/portfolio/${project.slug}`} class="block space-y-6">
+            <div class="relative aspect-[16/10] overflow-hidden rounded-sm bg-earth-200">
               {project.image_path ? (
                 <img 
                   src={`/api/media?path=${project.image_path}`} 
-                  class="aesthetic-image w-full h-full object-cover scale-[1.01]" 
+                  class="aesthetic-image w-full h-full object-cover scale-[1.01] group-hover:scale-105 transition-transform duration-1000 ease-out-expo" 
                   alt={project.title}
                 />
               ) : (
-                <div class="w-full h-full bg-earth-200 flex items-center justify-center">
-                  <span class="text-earth-400 font-serif italic text-lg">No Preview</span>
+                <div class="w-full h-full flex items-center justify-center">
+                  <span class="text-earth-400 font-serif italic text-lg">Work in progress</span>
                 </div>
               )}
+              <div class="absolute inset-0 bg-earth-900/0 group-hover:bg-earth-900/5 transition-colors duration-700"></div>
             </div>
 
-            <div class="space-y-4 px-4">
+            <div class="space-y-3 px-1">
               <div class="flex justify-between items-baseline gap-6">
-                <h2 class="text-3xl md:text-4xl font-light text-earth-900 transition-all duration-500">
+                <h2 class="text-3xl md:text-4xl font-serif font-light text-earth-900 group-hover:text-clay transition-colors duration-500">
                   {project.title}
                 </h2>
-                <span class="text-xs font-medium text-earth-400 uppercase tracking-[0.3em] whitespace-nowrap">{project.year}</span>
+                <span class="text-[10px] font-bold text-earth-400 uppercase tracking-[0.2em] whitespace-nowrap">{project.year}</span>
               </div>
 
-              <!-- Expanding description -->
-              <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-700 ease-out-expo overflow-hidden">
-                <div 
-                  class="prose prose-sm prose-earth text-earth-700 font-light leading-relaxed min-h-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 pr-8"
-                  set:html={marked.parse(project.description || '')}
-                />
-              </div>
-              <div class="pt-2 flex items-center gap-2 text-earth-900 font-medium text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 chill-transition translate-y-2 group-hover:translate-y-0">
-                <span>Explore Project</span>
-                <span class="text-lg font-thin">&rarr;</span>
+              <p class="text-earth-600 font-light leading-relaxed line-clamp-2 text-sm group-hover:text-earth-800 transition-colors duration-500">
+                {project.description}
+              </p>
+
+              <div class="pt-4 flex items-center gap-2 text-earth-900 font-bold text-[9px] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 chill-transition translate-y-2 group-hover:translate-y-0">
+                <span>View Details</span>
+                <span class="text-lg font-thin text-clay group-hover:translate-x-1 transition-transform">&rarr;</span>
               </div>
             </div>
 

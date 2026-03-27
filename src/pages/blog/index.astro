@@ -20,52 +20,49 @@ try {
   <main class="flex-grow w-full max-w-5xl mx-auto px-8 md:px-16 py-16 md:py-32 relative z-10">
     
     <header class="mb-24 md:mb-32 text-center animate-fade-up" style="animation-delay: 200ms;">
-      <h1 class="text-5xl md:text-7xl font-light text-earth-900 tracking-tight mb-4">Journal</h1>
-      <p class="text-lg text-earth-600 font-light italic max-w-lg mx-auto">
+      <h1 class="text-6xl md:text-8xl font-serif font-light text-earth-900 tracking-tight mb-4">Journal</h1>
+      <p class="text-xl text-earth-600 font-light italic max-w-lg mx-auto">
         Chronicles of architecture, design, and aimless wandering.
       </p>
-      <div class="w-px h-16 bg-earth-300 mx-auto mt-12"></div>
+      <div class="w-px h-20 bg-earth-300 mx-auto mt-12"></div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-32">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-24 gap-y-24 md:gap-y-32">
       {posts.length > 0 ? posts.map((post, index) => (
         <article class="group relative animate-fade-up" style={`animation-delay: ${300 + (index * 150)}ms;`}>
-          <a href={`/blog/${post.slug}`} class="block space-y-8 hover-lift">
-            <div class="relative aspect-[4/5] overflow-hidden rounded-sm">
+          <a href={`/blog/${post.slug}`} class="block space-y-8">
+            <div class="relative aspect-[4/5] overflow-hidden rounded-sm bg-earth-200">
               {post.image_path ? (
                 <img 
                   src={`/api/media?path=${post.image_path}`} 
-                  class="aesthetic-image w-full h-full object-cover scale-[1.01]" 
+                  class="aesthetic-image w-full h-full object-cover scale-[1.01] group-hover:scale-105 transition-transform duration-1000 ease-out-expo" 
                   alt={post.title}
                 />
               ) : (
-                <div class="w-full h-full bg-earth-200 flex items-center justify-center italic text-earth-400 text-lg">
+                <div class="w-full h-full flex items-center justify-center italic text-earth-400 text-lg">
                   No visual record
                 </div>
               )}
               <div class="absolute top-6 left-6">
-                <time datetime={new Date(post.pubDate).toISOString()} class="px-4 py-1.5 text-xs uppercase tracking-[0.3em] bg-earth-900/10 backdrop-blur-md text-earth-900 font-medium rounded-full">
+                <time datetime={new Date(post.pubDate).toISOString()} class="px-5 py-2 text-[10px] uppercase tracking-[0.3em] bg-earth-100/80 backdrop-blur-md text-earth-900 font-bold rounded-full border border-earth-300">
                   {new Date(post.pubDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </time>
               </div>
+              <div class="absolute inset-0 bg-earth-900/0 group-hover:bg-earth-900/5 transition-colors duration-700"></div>
             </div>
             
-            <div class="space-y-4 px-4">
-              <h2 class="text-3xl md:text-4xl font-light text-earth-900 transition-all duration-700 leading-tight">
+            <div class="space-y-4 px-1">
+              <h2 class="text-3xl md:text-4xl font-serif font-light text-earth-900 group-hover:text-clay transition-all duration-700 leading-tight">
                 {post.title}
               </h2>
               
-              <!-- Expanding description -->
-              <div class="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-700 ease-out-expo overflow-hidden">
-                <div 
-                  class="prose prose-sm prose-earth text-earth-700 font-light leading-relaxed min-h-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 pr-8"
-                  set:html={marked.parse(post.description || '')}
-                />
-              </div>
+              <p class="text-earth-600 font-light leading-relaxed line-clamp-3 text-sm group-hover:text-earth-800 transition-colors duration-500">
+                {post.description}
+              </p>
 
-              <div class="pt-2 flex items-center gap-2 text-earth-900 font-medium text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 chill-transition translate-y-2 group-hover:translate-y-0">
-                <span>Open Journal</span>
-                <span class="text-lg font-thin">&rarr;</span>
+              <div class="pt-4 flex items-center gap-2 text-earth-900 font-bold text-[9px] uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 chill-transition translate-y-2 group-hover:translate-y-0">
+                <span>Read Musing</span>
+                <span class="text-lg font-thin text-clay group-hover:translate-x-1 transition-transform">&rarr;</span>
               </div>
             </div>
           </a>
