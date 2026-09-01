@@ -1,7 +1,9 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "hluaguo-com",
-	// "main": "./dist/server/entry.mjs",
+	// NOTE: keep "main" commented — the @astrojs/cloudflare adapter generates
+	// its own deploy config (dist/server/wrangler.json) during `astro build`.
+	// Uncommenting it breaks the Cloudflare Vite plugin at config-resolution time.
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": [
 		"nodejs_compat"
