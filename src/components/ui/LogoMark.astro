@@ -1,0 +1,31 @@
+---
+// The hluaguo.com mark: a stencil "H" sliced by two full-width hairline cuts
+// — the site's hairline-rule motif frozen into the letterform.
+//
+// Geometry (viewBox 0 0 100 100), all pieces are plain rects:
+//   · two stem tops        y  8–35
+//   · one full-width band  y 40–60  (the crossbar, including stem midsections)
+//   · two stem bottoms     y 65–92
+//   · hairline gaps: 5 units wide, at y 35–40 and y 60–65
+//
+// Uses `currentColor` so it adapts to its surroundings
+// (e.g. class="text-[#FD5200]" on dark panels, text-black on light ones).
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 100 100"
+  fill="currentColor"
+  aria-hidden="true"
+  class:list={['shrink-0', className]}
+>
+  <rect x="14" y="8" width="24" height="27"></rect>
+  <rect x="62" y="8" width="24" height="27"></rect>
+  <rect x="14" y="40" width="72" height="20"></rect>
+  <rect x="14" y="65" width="24" height="27"></rect>
+  <rect x="62" y="65" width="24" height="27"></rect>
+</svg>

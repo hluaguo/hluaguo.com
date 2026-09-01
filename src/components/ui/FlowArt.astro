@@ -1,0 +1,74 @@
+---
+// Plain-Astro port of the story-scroll (FlowArt) component.
+// Vanilla GSAP + ScrollTrigger — no React required.
+//
+// Usage:
+//   <FlowArt aria-label="…">
+//     <FlowSection style={{ 'background-color': '#000', color: '#fff' }}>…</FlowSection>
+//     …
+//   </FlowArt>
+interface Props {
+  class?: string;
+  'aria-label'?: string;
+}
+
+const { class: className, 'aria-label': ariaLabel = 'Story scroll' } = Astro.props;
+---
+
+<main
+  data-flow-art
+  aria-label={ariaLabel}
+  class:list={['w-full overflow-x-hidden', className]}
+>
+  <slot />
+</main>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const container = document.querySelector<HTMLElement>('[data-flow-art]');
+
+  if (container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const sections = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-flow-section]'),
+    );
+
+    sections.forEach((section, i) => {
+      gsap.set(section, { zIndex: i + 1 });
+
+      const inner = section.querySelector<HTMLElement>('[data-flow-inner]');
+      if (!inner) return;
+
+      // Un-rotate the incoming panel while it scrolls into view.
+      if (i > 0) {
+        gsap.set(inner, { rotation: 30, transformOrigin: 'bottom left' });
+        gsap.to(inner, {
+          rotation: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'top 25%',
+            scrub: true,
+          },
+        });
+      }
+
+      // Pin every panel except the last, so the next one sweeps over it.
+      if (i < sections.length - 1) {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'bottom bottom',
+          end: 'bottom top',
+          pin: true,
+          pinSpacing: false,
+        });
+      }
+    });
+
+    ScrollTrigger.refresh();
+  }
+</script>

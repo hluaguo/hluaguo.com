@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS places (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  lat REAL NOT NULL,
-  lng REAL NOT NULL,
-  note TEXT,
-  image_path TEXT, -- Path in R2
-  visit_date DATETIME DEFAULT CURRENT_TIMESTAMP
-);

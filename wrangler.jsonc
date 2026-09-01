@@ -10,19 +10,6 @@
 		"binding": "ASSETS",
 		"directory": "./dist/client"
 	},
-	"r2_buckets": [
-		{
-			"binding": "OUTPOST_STORAGE",
-			"bucket_name": "hluaguo-outpost-assets"
-		}
-	],
-	"d1_databases": [
-		{
-			"binding": "OUTPOST_DB",
-			"database_name": "hluaguo-outpost-db",
-			"database_id": "7ae5189e-654a-45de-b563-fdea0d025c2f"
-		}
-	],
 	"observability": {
 		"enabled": true
 	}

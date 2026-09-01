@@ -1,46 +1,38 @@
 ---
 import '../styles/global.css';
-import { ClientRouter } from 'astro:transitions';
-import GlowBackground from '../components/GlowBackground.astro';
-import WebGLBackground from '../components/WebGLBackground.astro';
 
 interface Props {
-	title: string;
-	description?: string;
+  title: string;
+  description?: string;
 }
 
 const { title, description = "Hugo Lau's Personal Website and Digital Outpost" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<ClientRouter />
-	</head>
-	<body class="min-h-screen flex flex-col relative overflow-x-hidden bg-earth-100 selection:bg-earth-800 selection:text-earth-100">
-		<GlowBackground />
-		<WebGLBackground />
-		
-		<!-- Dimmed Grid Background -->
-		<div class="pointer-events-none fixed inset-0 z-0 dimmed-grid opacity-[0.3]"></div>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-black text-white selection:bg-white selection:text-black">
+    <!-- Tactile Paper/Grain Noise Overlay -->
+    <div
+      class="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.08] mix-blend-multiply"
+      style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"
+    >
+    </div>
 
-		<!-- Tactile Paper/Grain Noise Overlay -->
-		<div 
-			class="pointer-events-none fixed inset-0 z-50 h-full w-full opacity-[0.1] mix-blend-multiply" 
-			style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');">
-		</div>
-		
-		<div class="relative z-10 flex flex-col min-h-screen">
-			<slot />
-		</div>
-	</body>
+    <slot />
+  </body>
 </html>

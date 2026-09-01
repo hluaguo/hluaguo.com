@@ -1,0 +1,27 @@
+---
+// One full-screen, full-bleed panel of the story scroll.
+// The GSAP engine in FlowArt.astro pins each section and un-rotates
+// the inner container as it scrolls into view.
+interface Props {
+  class?: string;
+  /** Inline styles for the section, e.g. { 'background-color': '#000', color: '#fff' } */
+  style?: Record<string, string>;
+  'aria-label'?: string;
+}
+
+const { class: className, style = {}, 'aria-label': ariaLabel } = Astro.props;
+---
+
+<section
+  data-flow-section
+  aria-label={ariaLabel}
+  class:list={['relative min-h-screen w-full overflow-hidden', className]}
+  style={style}
+>
+  <div
+    data-flow-inner
+    class="flow-art-container relative flex min-h-screen w-full flex-col justify-between gap-6 px-[4vw] pt-[clamp(2rem,8vw,4vw)] pb-[4vw] will-change-transform"
+  >
+    <slot />
+  </div>
+</section>
